@@ -516,13 +516,7 @@ class GaussianDiffusion:
         if device is None:
             device = next(model.parameters()).device
         assert isinstance(shape, (tuple, list))
-        
-        #if noise is not None:
-        #    img = noise
-        #else:
-        #    img = th.randn(*shape, device=device)
-        #indices = list(range(self.num_timesteps))[::-1]
-        
+                
         ratio = 5/10
         if noise is not None: # half forward
             img = noise
@@ -539,25 +533,11 @@ class GaussianDiffusion:
 
         for i in indices:
             t = th.tensor([i] * shape[0], device=device)
-            ###
+            
             with th.no_grad():
                 out = self.ddim_sample(model, img, t, clip_denoised=clip_denoised, denoised_fn=denoised_fn, model_kwargs=model_kwargs, eta=eta, trans_matrix=trans_matrix)
                 yield out
                 img = out["sample"]
-            ###
-            #img = img.requires_grad_()
-            #out = self.ddim_sample(model, img, t, clip_denoised=clip_denoised, denoised_fn=denoised_fn, model_kwargs=model_kwargs, eta=eta, trans_matrix=trans_matrix)
-            #yield out
-            #img = out["sample"]
-            #img = img.detach_()
-            ###
-            #sample = ((img + 1) * 127.5).clamp(0, 255).to(th.uint8)
-            #sample = sample.permute(0, 2, 3, 1)
-            #sample = sample.contiguous()
-            #sample = sample.cpu().numpy()
-            #from PIL import Image
-            #a = Image.fromarray(np.squeeze(sample))
-            #a.save('../Datasets/CL0RL5/center_5_to_1_10steps/z'+str(i)+'.png')
 
     def _vb_terms_bpd(
         self, model, x_start, x_t, t, clip_denoised=True, model_kwargs=None
